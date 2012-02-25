@@ -33,7 +33,7 @@
  *	@(#)extern.h	8.3 (Berkeley) 6/4/94
  */
 
-#include "../btree/extern.h"
+#include "bt_extern.h"
 
 int	 __rec_close __P((DB *));
 int	 __rec_delete __P((const DB *, const DBT *, u_int));

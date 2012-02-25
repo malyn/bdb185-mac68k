@@ -78,21 +78,21 @@ mpool.o: ../../mpool/mpool.c
 	${CL} -I../../mpool ../../mpool/mpool.c
 
 rec_close.o: ../../recno/rec_close.c
-	${CL} -I../../recno ../../recno/rec_close.c
+	${CL} -I../../recno -I../../btree ../../recno/rec_close.c
 rec_delete.o: ../../recno/rec_delete.c
-	${CL} -I../../recno ../../recno/rec_delete.c
+	${CL} -I../../recno -I../../btree ../../recno/rec_delete.c
 rec_get.o: ../../recno/rec_get.c
-	${CL} -I../../recno ../../recno/rec_get.c
+	${CL} -I../../recno -I../../btree ../../recno/rec_get.c
 rec_open.o: ../../recno/rec_open.c
-	${CL} -I../../recno ../../recno/rec_open.c
+	${CL} -I../../recno -I../../btree ../../recno/rec_open.c
 rec_put.o: ../../recno/rec_put.c
-	${CL} -I../../recno ../../recno/rec_put.c
+	${CL} -I../../recno -I../../btree ../../recno/rec_put.c
 rec_search.o: ../../recno/rec_search.c
-	${CL} -I../../recno ../../recno/rec_search.c
+	${CL} -I../../recno -I../../btree ../../recno/rec_search.c
 rec_seq.o: ../../recno/rec_seq.c
-	${CL} -I../../recno ../../recno/rec_seq.c
+	${CL} -I../../recno -I../../btree ../../recno/rec_seq.c
 rec_utils.o: ../../recno/rec_utils.c
-	${CL} -I../../recno ../../recno/rec_utils.c
+	${CL} -I../../recno -I../../btree ../../recno/rec_utils.c
 
 memmove.o:
 	${CC} -DMEMMOVE -c -O -I. -Iinclude clib/memmove.c

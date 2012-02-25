@@ -54,7 +54,7 @@ static char sccsid[] = "@(#)hash.c	8.9 (Berkeley) 6/16/94";
 #include <db.h>
 #include "hash.h"
 #include "page.h"
-#include "extern.h"
+#include "hash_extern.h"
 
 static int   alloc_segs __P((HTAB *, int));
 static int   flush_meta __P((HTAB *));

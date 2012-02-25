@@ -36,4 +36,4 @@
 enum SRCHOP { SDELETE, SINSERT, SEARCH};	/* Rec_search operation. */
 
 #include "../btree/btree.h"
-#include "extern.h"
+#include "rec_extern.h"

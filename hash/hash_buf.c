@@ -68,7 +68,7 @@ static char sccsid[] = "@(#)hash_buf.c	8.5 (Berkeley) 7/15/94";
 #include <db.h>
 #include "hash.h"
 #include "page.h"
-#include "extern.h"
+#include "hash_extern.h"
 
 static BUFHEAD *newbuf __P((HTAB *, u_int32_t, BUFHEAD *));
 

@@ -380,4 +380,4 @@ typedef struct _btree {
 	u_int32_t flags;
 } BTREE;
 
-#include "extern.h"
+#include "bt_extern.h"
