@@ -35,14 +35,16 @@
 static char sccsid[] = "@(#)rec_seq.c	8.3 (Berkeley) 7/14/94";
 #endif /* not lint */
 
+#ifndef THINK_C
 #include <sys/types.h>
+#endif
 
 #include <errno.h>
 #include <limits.h>
 #include <stdio.h>
 #include <string.h>
 
-#include <db.h>
+#include "db.h"
 #include "recno.h"
 
 /*

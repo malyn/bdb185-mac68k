@@ -35,20 +35,28 @@
 static char sccsid[] = "@(#)mpool.c	8.5 (Berkeley) 7/26/94";
 #endif /* LIBC_SCCS and not lint */
 
+#ifndef THINK_C
 #include <sys/param.h>
-#include <sys/queue.h>
 #include <sys/stat.h>
+#else
+#include "stat.h"
+#endif
+#include "queue.h"
 
 #include <errno.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#ifndef THINK_C
 #include <unistd.h>
+#else
+#include <unix.h>
+#endif
 
-#include <db.h>
+#include "db.h"
 
 #define	__MPOOLINTERFACE_PRIVATE
-#include <mpool.h>
+#include "mpool.h"
 
 static BKT *mpool_bkt __P((MPOOL *));
 static BKT *mpool_look __P((MPOOL *, pgno_t));
@@ -76,10 +84,12 @@ mpool_open(key, fd, pagesize, maxcache)
 	 */
 	if (fstat(fd, &sb))
 		return (NULL);
+#ifndef THINK_C
 	if (!S_ISREG(sb.st_mode)) {
 		errno = ESPIPE;
 		return (NULL);
 	}
+#endif
 
 	/* Allocate and initialize the MPOOL cookie. */
 	if ((mp = (MPOOL *)calloc(1, sizeof(MPOOL))) == NULL)
@@ -296,8 +306,12 @@ mpool_sync(mp)
 		    mpool_write(mp, bp) == RET_ERROR)
 			return (RET_ERROR);
 
+#ifdef THINK_C
+	/* TODO: Should we call FlushVol? */
+#else
 	/* Sync the file descriptor. */
 	return (fsync(mp->fd) ? RET_ERROR : RET_SUCCESS);
+#endif
 }
 
 /*

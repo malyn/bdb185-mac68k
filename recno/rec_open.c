@@ -38,18 +38,26 @@
 static char sccsid[] = "@(#)rec_open.c	8.10 (Berkeley) 9/1/94";
 #endif /* LIBC_SCCS and not lint */
 
+#ifndef THINK_C
 #include <sys/types.h>
 #include <sys/mman.h>
 #include <sys/stat.h>
+#else
+#include "stat.h"
+#endif
 
 #include <errno.h>
 #include <fcntl.h>
 #include <limits.h>
 #include <stddef.h>
 #include <stdio.h>
+#ifndef THINK_C
 #include <unistd.h>
+#else
+#include <unix.h>
+#endif
 
-#include <db.h>
+#include "db.h"
 #include "recno.h"
 
 DB *
@@ -66,7 +74,11 @@ __rec_open(fname, flags, mode, openinfo, dflags)
 	int rfd, sverrno;
 
 	/* Open the user's file -- if this fails, we're done. */
+#ifdef THINK_C
+	if (fname != NULL && (rfd = open((char *)fname, flags)) < 0)
+#else
 	if (fname != NULL && (rfd = open(fname, flags, mode)) < 0)
+#endif
 		return (NULL);
 
 	/* Create a btree in memory (backed by disk). */
@@ -120,7 +132,11 @@ __rec_open(fname, flags, mode, openinfo, dflags)
 		 * and check the errno values.
 		 */
 		errno = 0;
+#ifdef THINK_C
+		if (0) {
+#else
 		if (lseek(rfd, (off_t)0, SEEK_CUR) == -1 && errno == ESPIPE) {
+#endif
 			switch (flags & O_ACCMODE) {
 			case O_RDONLY:
 				F_SET(t, R_RDONLY);
@@ -158,7 +174,7 @@ slow:			if ((t->bt_rfp = fdopen(rfd, "r")) == NULL)
 			if (sb.st_size == 0)
 				F_SET(t, R_EOF);
 			else {
-#ifdef MMAP_NOT_AVAILABLE
+#ifndef MMAP_NOT_AVAILABLE
 				/*
 				 * XXX
 				 * Mmap doesn't work correctly on many current

@@ -38,13 +38,15 @@
 static char sccsid[] = "@(#)bt_get.c	8.6 (Berkeley) 7/20/94";
 #endif /* LIBC_SCCS and not lint */
 
+#ifndef THINK_C
 #include <sys/types.h>
+#endif
 
 #include <errno.h>
 #include <stddef.h>
 #include <stdio.h>
 
-#include <db.h>
+#include "db.h"
 #include "btree.h"
 
 /*

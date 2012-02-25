@@ -46,19 +46,29 @@ static char sccsid[] = "@(#)bt_open.c	8.10 (Berkeley) 8/17/94";
  * is wholly independent of the Postgres code.
  */
 
+#ifndef THINK_C
 #include <sys/param.h>
 #include <sys/stat.h>
+#else
+#include "stat.h"
+#endif
 
 #include <errno.h>
 #include <fcntl.h>
 #include <limits.h>
+#ifndef THINK_C
 #include <signal.h>
+#endif
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#ifndef THINK_C
 #include <unistd.h>
+#else
+#include <unix.h>
+#endif
 
-#include <db.h>
+#include "db.h"
 #include "btree.h"
 
 #ifdef DEBUG
@@ -201,24 +211,35 @@ __bt_open(fname, flags, mode, openinfo, dflags)
 			goto einval;
 		}
 		
+#ifdef THINK_C
+		if ((t->bt_fd = open((char *)fname, flags)) < 0)
+			goto err;
+#else
 		if ((t->bt_fd = open(fname, flags, mode)) < 0)
 			goto err;
+#endif
 
 	} else {
+#ifdef THINK_C
+		goto einval;
+#else
 		if ((flags & O_ACCMODE) != O_RDWR)
 			goto einval;
 		if ((t->bt_fd = tmp()) == -1)
 			goto err;
 		F_SET(t, B_INMEM);
+#endif
 	}
 
+#ifndef THINK_C
 	if (fcntl(t->bt_fd, F_SETFD, 1) == -1)
 		goto err;
+#endif
 
 	if (fstat(t->bt_fd, &sb))
 		goto err;
 	if (sb.st_size) {
-		if ((nr = read(t->bt_fd, &m, sizeof(BTMETA))) < 0)
+		if ((nr = read(t->bt_fd, (char *)&m, sizeof(BTMETA))) < 0)
 			goto err;
 		if (nr != sizeof(BTMETA))
 			goto eftype;
@@ -383,6 +404,7 @@ nroot(t)
 	return (RET_SUCCESS);
 }
 
+#ifndef THINK_C
 static int
 tmp()
 {
@@ -402,6 +424,7 @@ tmp()
 	(void)sigprocmask(SIG_SETMASK, &oset, NULL);
 	return(fd);
 }
+#endif
 
 static int
 byteorder()

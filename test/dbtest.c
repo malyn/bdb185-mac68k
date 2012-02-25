@@ -53,7 +53,7 @@ static char sccsid[] = "@(#)dbtest.c	8.17 (Berkeley) 9/1/94";
 #include <string.h>
 #include <unistd.h>
 
-#include <db.h>
+#include "db.h"
 
 enum S { COMMAND, COMPARE, GET, PUT, REMOVE, SEQ, SEQFLAG, KEY, DATA };
 

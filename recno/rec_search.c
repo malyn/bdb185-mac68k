@@ -35,12 +35,14 @@
 static char sccsid[] = "@(#)rec_search.c	8.4 (Berkeley) 7/14/94";
 #endif /* LIBC_SCCS and not lint */
 
+#ifndef THINK_C
 #include <sys/types.h>
+#endif
 
 #include <errno.h>
 #include <stdio.h>
 
-#include <db.h>
+#include "db.h"
 #include "recno.h"
 
 /*

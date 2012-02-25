@@ -38,20 +38,28 @@
 static char sccsid[] = "@(#)hash.c	8.9 (Berkeley) 6/16/94";
 #endif /* LIBC_SCCS and not lint */
 
+#ifndef THINK_C
 #include <sys/param.h>
 #include <sys/stat.h>
+#else
+#include "stat.h"
+#endif
 
 #include <errno.h>
 #include <fcntl.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#ifndef THINK_C
 #include <unistd.h>
+#else
+#include <unix.h>
+#endif
 #ifdef DEBUG
 #include <assert.h>
 #endif
 
-#include <db.h>
+#include "db.h"
 #include "hash.h"
 #include "page.h"
 #include "hash_extern.h"
@@ -128,9 +136,14 @@ __hash_open(file, flags, mode, info, dflags)
 		new_table = 1;
 	}
 	if (file) {
+#ifdef THINK_C
+		if ((hashp->fp = open((char *)file, flags)) == -1)
+			RETURN_ERROR(errno, error0);
+#else
 		if ((hashp->fp = open(file, flags, mode)) == -1)
 			RETURN_ERROR(errno, error0);
 		(void)fcntl(hashp->fp, F_SETFD, 1);
+#endif
 	}
 	if (new_table) {
 		if (!(hashp = init_hash(hashp, file, (HASHINFO *)info)))
@@ -142,7 +155,7 @@ __hash_open(file, flags, mode, info, dflags)
 		else
 			hashp->hash = __default_hash;
 
-		hdrsize = read(hashp->fp, &hashp->hdr, sizeof(HASHHDR));
+		hdrsize = read(hashp->fp, (char *)&hashp->hdr, sizeof(HASHHDR));
 #if BYTE_ORDER == LITTLE_ENDIAN
 		swap_header(hashp);
 #endif
@@ -500,7 +513,7 @@ flush_meta(hashp)
 	swap_header_copy(&hashp->hdr, whdrp);
 #endif
 	if ((lseek(fp, (off_t)0, SEEK_SET) == -1) ||
-	    ((wsize = write(fp, whdrp, sizeof(HASHHDR))) == -1))
+	    ((wsize = write(fp, (char *)whdrp, sizeof(HASHHDR))) == -1))
 		return (-1);
 	else
 		if (wsize != sizeof(HASHHDR)) {

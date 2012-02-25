@@ -54,7 +54,9 @@ static char sccsid[] = "@(#)hash_buf.c	8.5 (Berkeley) 7/15/94";
  *	newbuf
  */
 
+#ifndef THINK_C
 #include <sys/param.h>
+#endif
 
 #include <errno.h>
 #include <stddef.h>
@@ -65,7 +67,7 @@ static char sccsid[] = "@(#)hash_buf.c	8.5 (Berkeley) 7/15/94";
 #include <assert.h>
 #endif
 
-#include <db.h>
+#include "db.h"
 #include "hash.h"
 #include "page.h"
 #include "hash_extern.h"

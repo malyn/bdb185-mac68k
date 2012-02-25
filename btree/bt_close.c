@@ -38,15 +38,21 @@
 static char sccsid[] = "@(#)bt_close.c	8.7 (Berkeley) 8/17/94";
 #endif /* LIBC_SCCS and not lint */
 
+#ifndef THINK_C
 #include <sys/param.h>
+#endif
 
 #include <errno.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#ifndef THINK_C
 #include <unistd.h>
+#else
+#include <unix.h>
+#endif
 
-#include <db.h>
+#include "db.h"
 #include "btree.h"
 
 static int bt_meta __P((BTREE *));

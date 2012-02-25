@@ -49,7 +49,7 @@ static char sccsid[] = "@(#)thash4.c	8.1 (Berkeley) 6/4/93";
 #include <sys/timeb.h>
 #include <stdio.h>
 #include <errno.h>
-#include <db.h>
+#include "db.h"
 
 #define INITIAL	25000
 #define MAXWORDS    25000	       /* # of elements in search table */

@@ -47,7 +47,7 @@ static char sccsid[] = "@(#)tverify.c	8.1 (Berkeley) 6/4/93";
 #include <sys/types.h>
 #include <sys/file.h>
 #include <stdio.h>
-#include <db.h>
+#include "db.h"
 
 #define INITIAL	25000
 #define MAXWORDS    25000	       /* # of elements in search table */

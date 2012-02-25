@@ -36,13 +36,15 @@
 #ifndef _DB_H_
 #define	_DB_H_
 
+#ifndef THINK_C
 #include <sys/types.h>
-#include <sys/cdefs.h>
+#endif
+#include "cdefs.h"
 
 #include <limits.h>
 
 #ifdef __DBINTERFACE_PRIVATE
-#include <compat.h>
+#include "compat.h"
 #endif
 
 #define	RET_ERROR	-1		/* Return values. */

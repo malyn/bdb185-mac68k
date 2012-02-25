@@ -38,14 +38,16 @@
 static char sccsid[] = "@(#)bt_seq.c	8.7 (Berkeley) 7/20/94";
 #endif /* LIBC_SCCS and not lint */
 
+#ifndef THINK_C
 #include <sys/types.h>
+#endif
 
 #include <errno.h>
 #include <stddef.h>
 #include <stdio.h>
 #include <stdlib.h>
 
-#include <db.h>
+#include "db.h"
 #include "btree.h"
 
 static int __bt_first __P((BTREE *, const DBT *, EPG *, int *));
@@ -358,7 +360,7 @@ __bt_first(t, key, erval, exactp)
 	 * page) and return it.
 	 */
 	if ((ep = __bt_search(t, key, exactp)) == NULL)
-		return (NULL);
+		return (0);
 	if (*exactp) {
 		if (F_ISSET(t, B_NODUPS)) {
 			*erval = *ep;

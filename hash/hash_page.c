@@ -54,7 +54,9 @@ static char sccsid[] = "@(#)hash_page.c	8.7 (Berkeley) 8/16/94";
  *	open_temp
  */
 
+#ifndef THINK_C
 #include <sys/types.h>
+#endif
 
 #include <errno.h>
 #include <fcntl.h>
@@ -62,12 +64,16 @@ static char sccsid[] = "@(#)hash_page.c	8.7 (Berkeley) 8/16/94";
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#ifndef THINK_C
 #include <unistd.h>
+#else
+#include <unix.h>
+#endif
 #ifdef DEBUG
 #include <assert.h>
 #endif
 
-#include <db.h>
+#include "db.h"
 #include "hash.h"
 #include "page.h"
 #include "hash_extern.h"
@@ -104,7 +110,7 @@ putpair(p, key, val)
 	/* Enter the key first. */
 	n = bp[0];
 
-	off = OFFSET(bp) - key->size;
+	off = PAGE_OFFSET(bp) - key->size;
 	memmove(p + off, key->data, key->size);
 	bp[++n] = off;
 
@@ -148,9 +154,9 @@ __delpair(hashp, bufp, ndx)
 	if (ndx != (n - 1)) {
 		/* Hard Case -- need to shuffle keys */
 		register int i;
-		register char *src = bufp->page + (int)OFFSET(bp);
+		register char *src = bufp->page + (int)PAGE_OFFSET(bp);
 		register char *dst = src + (int)pairlen;
-		memmove(dst, src, bp[ndx + 1] - OFFSET(bp));
+		memmove(dst, src, bp[ndx + 1] - PAGE_OFFSET(bp));
 
 		/* Now adjust the pointers */
 		for (i = ndx + 2; i <= n; i += 2) {
@@ -164,7 +170,7 @@ __delpair(hashp, bufp, ndx)
 		}
 	}
 	/* Finally adjust the page data */
-	bp[n] = OFFSET(bp) + pairlen;
+	bp[n] = PAGE_OFFSET(bp) + pairlen;
 	bp[n - 1] = bp[n + 1] + pairlen + 2 * sizeof(u_int16_t);
 	bp[0] = n - 2;
 	hashp->NKEYS--;
@@ -245,7 +251,7 @@ __split_page(hashp, obucket, nbucket)
 	/* Now clean up the page */
 	ino[0] -= moved;
 	FREESPACE(ino) = copyto - sizeof(u_int16_t) * (ino[0] + 3);
-	OFFSET(ino) = copyto;
+	PAGE_OFFSET(ino) = copyto;
 
 #ifdef DEBUG3
 	(void)fprintf(stderr, "split %d/%d\n",
@@ -328,7 +334,7 @@ ugly_split(hashp, obucket, old_bufp, new_bufp, copyto, moved)
 			ino[0] -= (moved + 2);
 			FREESPACE(ino) =
 			    scopyto - sizeof(u_int16_t) * (ino[0] + 3);
-			OFFSET(ino) = scopyto;
+			PAGE_OFFSET(ino) = scopyto;
 
 			bufp = __get_buf(hashp, ov_addr, bufp, 0);
 			if (!bufp)
@@ -498,7 +504,7 @@ __add_ovflpage(hashp, bufp)
 	 * an overflow page, we know that the OVFL information will fit on
 	 * the page.
 	 */
-	sp[ndx + 4] = OFFSET(sp);
+	sp[ndx + 4] = PAGE_OFFSET(sp);
 	sp[ndx + 3] = FREESPACE(sp) - OVFLSIZE;
 	sp[ndx + 1] = ovfl_num;
 	sp[ndx + 2] = OVFLPAGE;
@@ -859,6 +865,9 @@ static int
 open_temp(hashp)
 	HTAB *hashp;
 {
+#ifdef THINK_C
+	return -1;
+#else
 	sigset_t set, oset;
 	static char namestr[] = "_hashXXXXXX";
 
@@ -871,6 +880,7 @@ open_temp(hashp)
 	}
 	(void)sigprocmask(SIG_SETMASK, &oset, (sigset_t *)NULL);
 	return (hashp->fp != -1 ? 0 : -1);
+#endif
 }
 
 /*
@@ -888,7 +898,7 @@ squeeze_key(sp, key, val)
 	p = (char *)sp;
 	n = sp[0];
 	free_space = FREESPACE(sp);
-	off = OFFSET(sp);
+	off = PAGE_OFFSET(sp);
 
 	pageno = sp[n - 1];
 	off -= key->size;
@@ -901,7 +911,7 @@ squeeze_key(sp, key, val)
 	sp[n + 1] = pageno;
 	sp[n + 2] = OVFLPAGE;
 	FREESPACE(sp) = free_space - PAIRSIZE(key, val);
-	OFFSET(sp) = off;
+	PAGE_OFFSET(sp) = off;
 }
 
 static u_int32_t *

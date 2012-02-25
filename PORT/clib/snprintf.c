@@ -1,7 +1,7 @@
 #include <sys/types.h>
-#include <sys/cdefs.h>
+#include "cdefs.h"
 
-#include <compat.h>
+#include "compat.h"
 
 #ifdef __STDC__
 #include <stdarg.h>

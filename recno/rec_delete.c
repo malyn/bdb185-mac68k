@@ -38,13 +38,15 @@
 static char sccsid[] = "@(#)rec_delete.c	8.7 (Berkeley) 7/14/94";
 #endif /* LIBC_SCCS and not lint */
 
+#ifndef THINK_C
 #include <sys/types.h>
+#endif
 
 #include <errno.h>
 #include <stdio.h>
 #include <string.h>
 
-#include <db.h>
+#include "db.h"
 #include "recno.h"
 
 static int rec_rdelete __P((BTREE *, recno_t));

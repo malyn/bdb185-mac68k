@@ -56,7 +56,9 @@ static char sccsid[] = "@(#)hash_bigkey.c	8.3 (Berkeley) 5/31/94";
  *	collect_data
  */
 
+#ifndef THINK_C
 #include <sys/param.h>
+#endif
 
 #include <errno.h>
 #include <stdio.h>
@@ -67,7 +69,7 @@ static char sccsid[] = "@(#)hash_bigkey.c	8.3 (Berkeley) 5/31/94";
 #include <assert.h>
 #endif
 
-#include <db.h>
+#include "db.h"
 #include "hash.h"
 #include "page.h"
 #include "hash_extern.h"
@@ -107,7 +109,7 @@ __big_insert(hashp, bufp, key, val)
 	for (space = FREESPACE(p) - BIGOVERHEAD; key_size;
 	    space = FREESPACE(p) - BIGOVERHEAD) {
 		move_bytes = MIN(space, key_size);
-		off = OFFSET(p) - move_bytes;
+		off = PAGE_OFFSET(p) - move_bytes;
 		memmove(cp + off, key_data, move_bytes);
 		key_size -= move_bytes;
 		key_data += move_bytes;
@@ -115,7 +117,7 @@ __big_insert(hashp, bufp, key, val)
 		p[++n] = off;
 		p[0] = ++n;
 		FREESPACE(p) = off - PAGE_META(n);
-		OFFSET(p) = off;
+		PAGE_OFFSET(p) = off;
 		p[n] = PARTIAL_KEY;
 		bufp = __add_ovflpage(hashp, bufp);
 		if (!bufp)
@@ -124,14 +126,14 @@ __big_insert(hashp, bufp, key, val)
 		if (!key_size)
 			if (FREESPACE(p)) {
 				move_bytes = MIN(FREESPACE(p), val_size);
-				off = OFFSET(p) - move_bytes;
+				off = PAGE_OFFSET(p) - move_bytes;
 				p[n] = off;
 				memmove(cp + off, val_data, move_bytes);
 				val_data += move_bytes;
 				val_size -= move_bytes;
 				p[n - 2] = FULL_KEY_DATA;
 				FREESPACE(p) = FREESPACE(p) - move_bytes;
-				OFFSET(p) = off;
+				PAGE_OFFSET(p) = off;
 			} else
 				p[n - 2] = FULL_KEY;
 		p = (u_int16_t *)bufp->page;
@@ -149,7 +151,7 @@ __big_insert(hashp, bufp, key, val)
 		 */
 		if (space == val_size && val_size == val->size)
 			move_bytes--;
-		off = OFFSET(p) - move_bytes;
+		off = PAGE_OFFSET(p) - move_bytes;
 		memmove(cp + off, val_data, move_bytes);
 		val_size -= move_bytes;
 		val_data += move_bytes;
@@ -157,7 +159,7 @@ __big_insert(hashp, bufp, key, val)
 		p[++n] = off;
 		p[0] = ++n;
 		FREESPACE(p) = off - PAGE_META(n);
-		OFFSET(p) = off;
+		PAGE_OFFSET(p) = off;
 		if (val_size) {
 			p[n] = FULL_KEY;
 			bufp = __add_ovflpage(hashp, bufp);
@@ -244,7 +246,7 @@ __big_delete(hashp, bufp)
 	n -= 2;
 	bp[0] = n;
 	FREESPACE(bp) = hashp->BSIZE - PAGE_META(n);
-	OFFSET(bp) = hashp->BSIZE - 1;
+	PAGE_OFFSET(bp) = hashp->BSIZE - 1;
 
 	bufp->flags |= BUF_MOD;
 	if (rbufp)
@@ -618,12 +620,12 @@ __big_split(hashp, op, np, big_keyp, addr, obucket, ret)
 	assert(FREESPACE(tp) >= OVFLSIZE);
 #endif
 	n = tp[0];
-	off = OFFSET(tp);
+	off = PAGE_OFFSET(tp);
 	free_space = FREESPACE(tp);
 	tp[++n] = (u_int16_t)addr;
 	tp[++n] = OVFLPAGE;
 	tp[0] = n;
-	OFFSET(tp) = off;
+	PAGE_OFFSET(tp) = off;
 	FREESPACE(tp) = free_space - OVFLSIZE;
 
 	/*
@@ -648,10 +650,10 @@ __big_split(hashp, op, np, big_keyp, addr, obucket, ret)
 		 */
 		n = tp[4];
 		free_space = FREESPACE(tp);
-		off = OFFSET(tp);
+		off = PAGE_OFFSET(tp);
 		tp[0] -= 2;
 		FREESPACE(tp) = free_space + OVFLSIZE;
-		OFFSET(tp) = off;
+		PAGE_OFFSET(tp) = off;
 		tmpp = __add_ovflpage(hashp, big_keyp);
 		if (!tmpp)
 			return (-1);

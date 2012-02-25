@@ -33,7 +33,7 @@
  *	@(#)mpool.h	8.2 (Berkeley) 7/14/94
  */
 
-#include <sys/queue.h>
+#include "queue.h"
 
 /*
  * The memory pool scheme is a simple one.  Each in-memory page is referenced

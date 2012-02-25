@@ -38,11 +38,13 @@
 static char sccsid[] = "@(#)bt_search.c	8.8 (Berkeley) 7/31/94";
 #endif /* LIBC_SCCS and not lint */
 
+#ifndef THINK_C
 #include <sys/types.h>
+#endif
 
 #include <stdio.h>
 
-#include <db.h>
+#include "db.h"
 #include "btree.h"
 
 static int __bt_snext __P((BTREE *, PAGE *, const DBT *, int *));

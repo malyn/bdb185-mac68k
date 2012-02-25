@@ -46,7 +46,7 @@ static char sccsid[] = "@(#)tdel.c	8.1 (Berkeley) 6/4/93";
 
 #include <sys/types.h>
 #include <sys/file.h>
-#include <db.h>
+#include "db.h"
 #include <stdio.h>
 
 #define INITIAL	25000

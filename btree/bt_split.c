@@ -38,14 +38,16 @@
 static char sccsid[] = "@(#)bt_split.c	8.9 (Berkeley) 7/26/94";
 #endif /* LIBC_SCCS and not lint */
 
+#ifndef THINK_C
 #include <sys/types.h>
+#endif
 
 #include <limits.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 
-#include <db.h>
+#include "db.h"
 #include "btree.h"
 
 static int	 bt_broot __P((BTREE *, PAGE *, PAGE *, PAGE *));

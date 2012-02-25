@@ -38,11 +38,13 @@
 static char sccsid[] = "@(#)bt_conv.c	8.5 (Berkeley) 8/17/94";
 #endif /* LIBC_SCCS and not lint */
 
+#ifndef THINK_C
 #include <sys/param.h>
+#endif
 
 #include <stdio.h>
 
-#include <db.h>
+#include "db.h"
 #include "btree.h"
 
 static void mswap __P((PAGE *));

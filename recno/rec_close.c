@@ -35,17 +35,39 @@
 static char sccsid[] = "@(#)rec_close.c	8.6 (Berkeley) 8/18/94";
 #endif /* LIBC_SCCS and not lint */
 
+#ifndef THINK_C
 #include <sys/types.h>
 #include <sys/uio.h>
 #include <sys/mman.h>
+#endif
 
 #include <errno.h>
 #include <limits.h>
 #include <stdio.h>
+#ifndef THINK_C
 #include <unistd.h>
+#else
+#include <unix.h>
+#endif
 
-#include <db.h>
+#include "db.h"
 #include "recno.h"
+
+#ifdef THINK_C
+static int ftruncate(int fd, long length)
+{
+	IOParam pb;
+	
+	pb.ioRefNum = __file[fd].refnum;
+	pb.ioMisc = (Ptr)length;
+	PBSetEOFSync(&pb);
+	if (pb.ioResult) {
+		errno = pb.ioResult;
+		return -1;
+	}
+	return 0;
+}
+#endif
 
 /*
  * __REC_CLOSE -- Close a recno tree.
@@ -76,8 +98,10 @@ __rec_close(dbp)
 
 	/* Committed to closing. */
 	status = RET_SUCCESS;
+#ifndef MMAP_NOT_AVAILABLE
 	if (F_ISSET(t, R_MEMMAPPED) && munmap(t->bt_smap, t->bt_msize))
 		status = RET_ERROR;
+#endif
 
 	if (!F_ISSET(t, R_INMEM))
 		if (F_ISSET(t, R_CLOSEFP)) {
@@ -107,7 +131,9 @@ __rec_sync(dbp, flags)
 	const DB *dbp;
 	u_int flags;
 {
+#ifndef THINK_C
 	struct iovec iov[2];
+#endif
 	BTREE *t;
 	DBT data, key;
 	off_t off;
@@ -155,15 +181,24 @@ __rec_sync(dbp, flags)
 			status = (dbp->seq)(dbp, &key, &data, R_NEXT);
 		}
 	} else {
+#ifndef THINK_C
 		iov[1].iov_base = &t->bt_bval;
 		iov[1].iov_len = 1;
+#endif
 
 		status = (dbp->seq)(dbp, &key, &data, R_FIRST);
 		while (status == RET_SUCCESS) {
+#ifndef THINK_C
 			iov[0].iov_base = data.data;
 			iov[0].iov_len = data.size;
 			if (writev(t->bt_rfd, iov, 2) != data.size + 1)
 				return (RET_ERROR);
+#else
+			if (write(t->bt_rfd, (char *)&t->bt_bval, 1) != 1)
+				return (RET_ERROR);
+			if (write(t->bt_rfd, data.data, data.size) != data.size)
+				return (RET_ERROR);
+#endif
 			status = (dbp->seq)(dbp, &key, &data, R_NEXT);
 		}
 	}

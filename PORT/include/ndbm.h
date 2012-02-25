@@ -39,7 +39,7 @@
 #ifndef _NDBM_H_
 #define	_NDBM_H_
 
-#include <db.h>
+#include "db.h"
 
 /* Map dbm interface onto db(3). */
 #define DBM_RDONLY	O_RDONLY

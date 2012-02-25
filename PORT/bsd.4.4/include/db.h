@@ -37,12 +37,12 @@
 #define	_DB_H_
 
 #include <sys/types.h>
-#include <sys/cdefs.h>
+#include "cdefs.h"
 
 #include <limits.h>
 
 #ifdef __DBINTERFACE_PRIVATE
-#include <compat.h>
+#include "compat.h"
 #endif
 
 #define	RET_ERROR	-1		/* Return values. */
