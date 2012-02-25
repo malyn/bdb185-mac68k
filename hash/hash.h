@@ -50,9 +50,9 @@ struct _bufhead {
 	BUFHEAD		*ovfl;		/* Overflow page buffer header */
 	u_int32_t	 addr;		/* Address of this page */
 	char		*page;		/* Actual page data */
-	char	 	flags;
+	int		 	flags;
 #define	BUF_MOD		0x0001
-#define BUF_DISK	0x0002
+#define BUF_DISK	0x80000000
 #define	BUF_BUCKET	0x0004
 #define	BUF_PIN		0x0008
 };
@@ -141,11 +141,9 @@ typedef struct htab	 {		/* Memory resident data structure */
 #define ALL_SET			((u_int32_t)0xFFFFFFFF)
 #define ALL_CLEAR		0
 
-#define PTROF(X)	((BUFHEAD *)((ptrdiff_t)(X)&~0x3))
-#define ISMOD(X)	((u_int32_t)(ptrdiff_t)(X)&0x1)
-#define DOMOD(X)	((X) = (char *)((ptrdiff_t)(X)|0x1))
-#define ISDISK(X)	((u_int32_t)(ptrdiff_t)(X)&0x2)
-#define DODISK(X)	((X) = (char *)((ptrdiff_t)(X)|0x2))
+#define PTROF(X)	((BUFHEAD *)((ptrdiff_t)(X)&~0x80000000))
+#define ISDISK(X)	((u_int32_t)(ptrdiff_t)(X)&0x80000000)
+#define DODISK(X)	((X) = (char *)((ptrdiff_t)(X)|0x80000000))
 
 #define BITS_PER_MAP	32
 

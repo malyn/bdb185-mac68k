@@ -49,10 +49,17 @@ static char sccsid[] = "@(#)hash_func.c	8.2 (Berkeley) 2/21/94";
 #include "page.h"
 #include "hash_extern.h"
 
+#ifdef THINK_C
+u_int32_t hash1 __P((const void *, size_t));
+u_int32_t hash2 __P((const void *, size_t));
+u_int32_t hash3 __P((const void *, size_t));
+u_int32_t hash4 __P((const void *, size_t));
+#else
 static u_int32_t hash1 __P((const void *, size_t));
 static u_int32_t hash2 __P((const void *, size_t));
 static u_int32_t hash3 __P((const void *, size_t));
 static u_int32_t hash4 __P((const void *, size_t));
+#endif
 
 /* Global default hash function */
 u_int32_t (*__default_hash) __P((const void *, size_t)) = hash4;
@@ -69,7 +76,10 @@ u_int32_t (*__default_hash) __P((const void *, size_t)) = hash4;
 #define PRIME1		37
 #define PRIME2		1048583
 
-static u_int32_t
+#ifndef THINK_C
+static
+#endif
+u_int32_t
 hash1(keyarg, len)
 	const void *keyarg;
 	register size_t len;
@@ -89,7 +99,10 @@ hash1(keyarg, len)
  */
 #define dcharhash(h, c)	((h) = 0x63c63cd9*(h) + 0x9c39c33d + (c))
 
-static u_int32_t
+#ifndef THINK_C
+static
+#endif
+u_int32_t
 hash2(keyarg, len)
 	const void *keyarg;
 	size_t len;
@@ -118,7 +131,10 @@ hash2(keyarg, len)
  *
  * OZ's original sdbm hash
  */
-static u_int32_t
+#ifndef THINK_C
+static
+#endif
+u_int32_t
 hash3(keyarg, len)
 	const void *keyarg;
 	register size_t len;
@@ -166,7 +182,10 @@ hash3(keyarg, len)
 }
 
 /* Hash function from Chris Torek. */
-static u_int32_t
+#ifndef THINK_C
+static
+#endif
+u_int32_t
 hash4(keyarg, len)
 	const void *keyarg;
 	register size_t len;

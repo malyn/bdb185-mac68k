@@ -36,7 +36,7 @@
 #ifndef _DB_H_
 #define	_DB_H_
 
-#ifndef THINK_C
+#if !defined(THINK_C) && !defined(__SC__)
 #include <sys/types.h>
 #endif
 #include "cdefs.h"
